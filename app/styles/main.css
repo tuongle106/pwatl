@@ -1,32 +1,9 @@
-/**
- * Copyright 2015 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
-Note: any .css or .scss files included in the 'styles' directory
-will be correctly compiled during `gulp serve` and `gulp`
- */
-
 html, body {
   font-family: 'Roboto', 'Helvetica', sans-serif;
   margin: 0;
   padding: 0;
 }
-.mdl-demo .mdl-layout__header-row {
-  padding-left: 40px;
-}
+
 .mdl-demo .mdl-layout.is-small-screen .mdl-layout__header-row h3 {
   font-size: inherit;
 }
@@ -42,6 +19,12 @@ html, body {
 }
 .mdl-demo .mdl-layout__tab-bar-container {
   height: 64px;
+}
+
+.mdl-list__item-avatar{
+}
+.mdl-textfield__expandable-holder {
+  display: inline;
 }
 .mdl-demo .mdl-layout__tab-bar {
   padding: 0;
@@ -71,11 +54,15 @@ html, body {
   height: auto;
 }
 .mdl-demo .mdl-card .mdl-card__supporting-text {
+  text-align: center;
   margin: 40px;
   flex-grow: 1;
   padding: 0;
   color: inherit;
   width: calc(100% - 80px);
+}
+.mdl-demo .mdl-card .mdl-card__supporting-text .mdl-card__button-board {
+margin-top: 4px;
 }
 .mdl-demo.mdl-demo .mdl-card__supporting-text h4 {
   margin-top: 0;
@@ -210,4 +197,25 @@ html, body {
 }
 .mdl-demo .mdl-menu__container {
   z-index: 99;
+}
+
+.select-board  p {
+  margin: 1px;
+  font-size: inherit;
+}
+
+.demo-layout-transparent {
+  background-color: #C1EEF4;
+}
+.demo-layout-transparent .mdl-layout__header,
+.demo-layout-transparent .mdl-layout__drawer-button {
+  /* This background is dark, so we set text to white. Use 87% black instead if
+     your background is light. */
+  color: black;
+}
+
+@media only screen and (min-width:851px){
+  /*.mdl-layout__drawer-button {
+    display: none;
+  }*/
 }
