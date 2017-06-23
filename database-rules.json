@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "histories": {
+      ".read": true,
+      ".write": "auth !== null"
+    }
+  }
+}
