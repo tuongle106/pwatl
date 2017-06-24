@@ -221,6 +221,12 @@ gulp.task('copy-sw-scripts', () => {
     .pipe(gulp.dest('dist/scripts/sw'));
 });
 
+// Copy over the scripts that are used in importScripts as part of the generate-service-worker task.
+gulp.task('copy-script-dist', () => {
+  return gulp.src(['app/vendor/material/material.min.js', 'app/vendor/jquery.min.js', 'app/vendor/lodash.min.js', 'app/vendor/jquery-dateFormat.min.js'])
+    .pipe(gulp.dest('dist/scripts'));
+});
+
 // See http://www.html5rocks.com/en/tutorials/service-worker/introduction/ for
 // an in-depth explanation of what service workers are and why you should care.
 // Generate a service worker file that will provide offline functionality for
@@ -232,7 +238,7 @@ gulp.task('generate-service-worker', ['copy-sw-scripts'], () => {
 
   return swPrecache.write(filepath, {
     // Used to avoid cache conflicts when serving on localhost.
-    cacheId: pkg.name || 'web-starter-kit',
+    cacheId: pkg.name || 'OneToNine',
     // sw-toolbox.js needs to be listed first. It sets up methods used in runtime-caching.js.
     importScripts: [
       'scripts/sw/sw-toolbox.js',

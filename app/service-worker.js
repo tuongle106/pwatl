@@ -12,8 +12,8 @@ self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
       return cache.addAll([
-        '/styles/main.css',
         '/scripts/main.min.js',
+        '/styles/main.css',
         '/styles/material.indigo-pink.min.css'
       ]).then(function() {
         self.skipWaiting();

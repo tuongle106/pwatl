@@ -136,11 +136,11 @@ OneToNine.prototype.signOut = function () {
 // Loads chat messages history and listens for upcoming ones.
 OneToNine.prototype.loadSingleHistory = function () {
   this.historiesRef = this.database.ref('s_histories');
+  var setMessage = function (data) {
+    this.historyList.innerHTML = this.renderHistoryList(true, data.val());
+  }.bind(this);
   this.historiesRef.off();
-  this.historiesRef.once('value').then(function (snapshot) {
-    console.log(snapshot.val());
-    //this.historyList.innerHTML = this.renderHistoryList(true, snapshot.val());
-  });
+  this.historiesRef.on('value', setMessage);
 
   //this.historiesRef.limitToLast(12).on('child_added', setMessage);
   //this.historiesRef.limitToLast(12).on('child_changed', setMessage);
@@ -282,19 +282,32 @@ OneToNine.prototype.addSingleHistory = function (history) {
 
 OneToNine.prototype.renderHistoryList = function (isSingle, historyList) {
   var result = '';
-  for (var i = 0; i < historyList.length; i++) {
-    var history = historyList[i];
-    var template = "<li class='mdl-list__item mdl-list__item--two-line'>" +
-    "<span class='mdl-list__item-primary-content'>" +
-    "<i class='material-icons mdl-list__item-avatar'>person</i>" +
-    "<span>" + "YOU" + "</span>" +
-    "<span class='mdl-list__item-sub-title'>" + history.playedDate + "</span></span>" +
-    "<span class='mdl-list__item-secondary-content'>" +
-    "<a class='mdl-list__item-secondary-action' href='#'><i class='material-icons'>" + history.status === 'w' ? 'star' : '' + "</i></a></span></li>";
-    result+=template;
-  }
+  $.each(historyList, function () {
+
+    var playedDate = this.playedDate;
+    var template =
+      '<li class="mdl-list__item mdl-list__item--two-line">' +
+      '<span class="mdl-list__item-primary-content">' +
+      '<i class="material-icons mdl-list__item-avatar">person</i>' +
+      '<span>' + this.id + '</span>' +
+      '<span class="mdl-list__item-sub-title">' + playedDate + '</span></span>' +
+      '<span class="mdl-list__item-secondary-content">' +
+      '<a class="mdl-list__item-secondary-action" href="#">' +
+      '<i class="material-icons">' + (this.status === 'w' ? "thumb_up" : "thumb_down") +
+      '</i></a></span></li>';
+    result += template;
+  });
   return result;
 };
+
+OneToNine.S_HISTORY_TEMPLATE =
+  '<li class="mdl-list__item mdl-list__item--two-line">' +
+  '<span class="mdl-list__item-primary-content">' +
+  '<i class="material-icons mdl-list__item-avatar">person</i>' +
+  '<span>%ID%</span>' +
+  '<span class="mdl-list__item-sub-title">%PLAYED_DATE%</span></span>' +
+  '<span class="mdl-list__item-secondary-content">' +
+  '<a class="mdl-list__item-secondary-action" href="#"><i class="material-icons">%STATUS%</i></a></span></li>';
 
 window.onload = function () {
   window.oneToNine = new OneToNine();

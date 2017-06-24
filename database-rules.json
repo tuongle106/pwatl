@@ -1,6 +1,10 @@
 {
   "rules": {
-    "histories": {
+    "s_histories": {
+      ".read": true,
+      ".write": "auth !== null"
+    },
+    "m_histories": {
       ".read": true,
       ".write": "auth !== null"
     }
