@@ -24,36 +24,17 @@
   <meta name="apple-mobile-web-app-title" content="Web Starter Kit">
   <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
 
-  <!-- Tile icon for Win8 (144x144 + tile color) -->
   <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
   <meta name="msapplication-TileColor" content="#2F3BA2">
-
-  <!-- Color the status bar on mobile devices -->
   <meta name="theme-color" content="#2F3BA2">
-
-  <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
-  <!--
-  <link rel="canonical" href="http://www.example.com/">
-  -->
-
-  <!-- Material Design icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-
-  <!-- Material Design Lite page styles:
-  You can choose other color schemes from the CDN, more info here http://www.getmdl.io/customize/index.html
-  Format: material.color1-color2.min.css, some examples:
-  material.red-teal.min.css
-  material.blue-orange.min.css
-  material.purple-indigo.min.css
-  -->
   <link rel="stylesheet" href="styles/material.indigo-pink.min.css">
 
   <!-- Your styles -->
   <link rel="stylesheet" href="styles/main.css">
 
 </head>
-<body class="mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
 <!-- Simple header with fixed tabs. -->
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
               mdl-layout--fixed-tabs">
@@ -64,12 +45,13 @@
       <div class="mdl-layout-spacer"></div>
       <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
                   mdl-textfield--floating-label mdl-textfield--align-right">
-        <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-button--icon" for="waterfall-exp">
-          <i class="material-icons">account_circle</i>
-        </button>
         <div class="mdl-list__item">
-          <span class="mdl-list__item-primary-content">
-            <i class="material-icons mdl-list__item-avatar" id="user-pic"></i>
+          <span class="mdl-list__item-primary-content" id="sign-in">
+            <img class="avatar" alt="avatar" src="images/profile_placeholder.png">
+          </span>
+
+          <span class="mdl-list__item-primary-content" hidden id="profile-container">
+            <img class="avatar" alt="avatar" id="user-pic">
             <span style="color: white" id="user-name">OneToNine</span>
           </span>
         </div>
@@ -136,7 +118,7 @@
         </div>
         <!--/GAME BOARD-->
 
-        <div hidden class="mdl-card mdl-cell mdl-cell--12-col" id="single-history-section">
+        <div hidden class="mdl-card mdl-cell mdl-cell--12-col history-section" id="single-history-section">
           <ul class="demo-list-two mdl-list" id="history-list">
           </ul>
         </div>
@@ -146,40 +128,6 @@
       <div class="page-content"><!-- Your content goes here -->
         <div class="mdl-card mdl-cell mdl-cell--12-col">
           <h1>Coming soon!!!!</h1>
-          <!--<form action="#">
-            <div class="text-field-warpper">
-              <div class="mdl-textfield mdl-js-textfield">
-                <input class="mdl-textfield__input" type="text" id="usermane" pattern="[A-Z,a-z, ]*">
-                <label class="mdl-textfield__label" for="usermane">User name</label>
-                <span class="mdl-textfield__error">Letters and spaces only</span>
-              </div>
-            </div>
-            <div class="text-field-warpper">
-              <div class="mdl-textfield mdl-js-textfield">
-                <input class="mdl-textfield__input" type="password" id="password" pattern="[A-Z,a-z, ]*">
-                <label class="mdl-textfield__label" for="password">Password</label>
-                <span class="mdl-textfield__error">Letters and spaces only</span>
-              </div>
-            </div>
-            <div class="text-field-warpper">
-              <button type="button"
-                      class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;colored">
-                Sign in
-              </button>
-              <button type="button" id="test-histories-list"
-                      class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;colored">
-                FETCH DATA
-              </button>
-              <button type="button"
-                      class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;colored">
-                Sign out
-              </button>
-              <button class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;accent"
-                      onclick="test()">
-                Cancel
-              </button>
-            </div>
-          </form>-->
         </div>
       </div>
     </section>
@@ -203,15 +151,7 @@
   };
   firebase.initializeApp(config);
 </script>
-<!-- build:js scripts/main.min.js -->
-<!--<script src="scripts/jquery.min.js"></script>
-<script src="scripts/jquery-dateFormat.min.js"></script>
-<script src="scripts/lodash.min.js"></script>
-<script src="scripts/material.min.js"></script>-->
 <script src="scripts/main.min.js"></script>
-<!-- endbuild -->
-
-<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
 <script>
   (function (i, s, o, g, r, a, m) {
     i['GoogleAnalyticsObject'] = r;

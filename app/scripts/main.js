@@ -1,30 +1,5 @@
-/*!
- *
- *  Web Starter Kit
- *  Copyright 2015 Google Inc. All rights reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *    https://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License
- *
- */
-/* eslint-env browser */
-
 (function () {
   'use strict';
-
-  // Check to make sure service workers are supported in the current browser,
-  // and that the current page is accessed from a secure origin. Using a
-  // service worker from an insecure origin will trigger JS console errors. See
-  // http://www.chromium.org/Home/chromium-security/prefer-secure-origins-for-powerful-new-features
   var isLocalhost = Boolean(window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
     window.location.hostname === '[::1]' ||
@@ -40,22 +15,12 @@
       .then(function (registration) {
         // updatefound is fired if service-worker.js changes.
         registration.onupdatefound = function () {
-          // updatefound is also fired the very first time the SW is installed,
-          // and there's no need to prompt for a reload at that point.
-          // So check here to see if the page is already controlled,
-          // i.e. whether there's an existing service worker.
           if (navigator.serviceWorker.controller) {
-            // The updatefound event implies that registration.installing is set:
-            // https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html#service-worker-container-updatefound-event
             var installingWorker = registration.installing;
 
             installingWorker.onstatechange = function () {
               switch (installingWorker.state) {
                 case 'installed':
-                  // At this point, the old content will have been purged and the
-                  // fresh content will have been added to the cache.
-                  // It's the perfect time to display a "New content is
-                  // available; please refresh." message in the page's interface.
                   break;
 
                 case 'redundant':
@@ -76,7 +41,6 @@
 })();
 
 
-
 function OneToNine() {
 
   //VARIABLE
@@ -86,7 +50,6 @@ function OneToNine() {
   this.rememberTime = 10; //10 sec
   this.answer = [];
   this.intervals = [];
-  this.userUUID = '';
 
   this.checkSetup();
 
@@ -96,13 +59,11 @@ function OneToNine() {
   this.signOutButton = document.getElementById('sign-out');
   this.historyList = document.getElementById('history-list');
   this.showSnackbarButton = document.getElementById('show-snackbar-button');
-  this.singleHistorySection = document.getElementById('single-history-section')
+  this.singleHistorySection = document.getElementById('single-history-section');
+  this.profileContainer = document.getElementById('profile-container');
 
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
-
-  //this.fetchHistoriesBtn = document.getElementById('test-histories-list');
-  //this.fetchHistoriesBtn.addEventListener('click', this.loadSingleHistory.bind(this));
 
   for (var i = 0; i < 9; i++) {
     //var slot = $('#slot' + (i + 1));
@@ -140,11 +101,14 @@ OneToNine.prototype.signOut = function () {
 // Loads chat messages history and listens for upcoming ones.
 OneToNine.prototype.loadSingleHistory = function () {
   this.historiesRef = this.database.ref('s_histories');
+
+  /*var topHistory = this.historiesRef.orderByChild('playedDate').limitToLast(10);
+   console.log(topHistory);*/
   var setMessage = function (data) {
     this.historyList.innerHTML = this.renderHistoryList(true, data.val());
   }.bind(this);
   this.historiesRef.off();
-  this.historiesRef.on('value', setMessage);
+  this.historiesRef.orderByChild('playedDate').limitToLast(10).on('value', setMessage);
 
   //this.historiesRef.limitToLast(12).on('child_added', setMessage);
   //this.historiesRef.limitToLast(12).on('child_changed', setMessage);
@@ -165,20 +129,15 @@ OneToNine.prototype.onAuthStateChanged = function (user) {
     var profilePicUrl = user.photoURL;
     var userName = user.displayName;
 
-    this.userPic.style.backgroundImage = 'url(' + (profilePicUrl || '/images/profile_placeholder.png') + ')';
+    this.userPic.setAttribute('src', profilePicUrl || 'images/profile_placeholder.png');
     this.userName.textContent = userName;
-
     this.userName.removeAttribute('hidden');
-
-    //this.userPic.attr('src', profilePicUrl || '/images/profile_placeholder.png');
-    this.userPic.removeAttribute('hidden');
+    this.profileContainer.removeAttribute('hidden');
     this.signOutButton.removeAttribute('hidden');
 
     // Hide sign-in button.
     this.signInButton.setAttribute('hidden', 'true');
     this.singleHistorySection.removeAttribute('hidden');
-
-    this.userUUID = user.uid;
     // Load history online
     this.loadSingleHistory();
 
@@ -187,11 +146,10 @@ OneToNine.prototype.onAuthStateChanged = function (user) {
     //Save divice token to push notification
     this.saveMessagingDeviceToken();
   } else { // User is signed out!
-    this.userUUID = '';
     // Hide user's profile and sign-out button.
     this.userName.setAttribute('hidden', 'true');
-    this.userPic.setAttribute('hidden', 'true');
     this.signOutButton.setAttribute('hidden', 'true');
+    this.profileContainer.setAttribute('hidden', 'true');
     this.singleHistorySection.setAttribute('hidden', 'true');
 
     // Show sign-in button.
@@ -265,14 +223,14 @@ OneToNine.prototype.selectSingleBoard = function (e) {
     } else if (this.answer.length === 8 && selectedValue === 9) {
       //console.log("last chose is true");
       this.answer.push(selectedValue);
-      this.toastSuccessMessage('Congratulation!! You win...');
-      this.addSingleHistory(new sHistory(this.userUUID, $.now(), 'w'));
+      this.toastSuccessMessage('Congratulation!! You win... (y)');
+      this.addSingleHistory(new sHistory(this.userName.textContent, $.now(), 'w'));
       //console.log("new board is loading");
       this.initSingleBoardGame();
     } else {
-      this.toastFailMessage('Give up pls!! Loser');
+      this.toastFailMessage('Give up pls!! Loser :)');
       //console.log("new board is loading");
-      this.addSingleHistory(new sHistory(this.userUUID, $.now(), 'l'));
+      this.addSingleHistory(new sHistory(this.userName.textContent, $.now(), 'l'));
       this.initSingleBoardGame();
     }
   }
@@ -289,20 +247,19 @@ OneToNine.prototype.addSingleHistory = function (history) {
 
 OneToNine.prototype.renderHistoryList = function (isSingle, historyList) {
   var result = '';
+  var template =
+    '<li class="mdl-list__item mdl-list__item--two-line">' +
+    '<span class="mdl-list__item-primary-content">' +
+    '<span>%USER_NAME%</span>' +
+    '<span class="mdl-list__item-sub-title">%PLAYED_DATE%</span></span>' +
+    '<span class="mdl-list__item-secondary-content">' +
+    '<span class="mdl-list__item-secondary-action">%ICON_STATUS%</span></span></li>';
   $.each(historyList, function () {
-
-    var playedDate = this.playedDate;
-    var template =
-      '<li class="mdl-list__item mdl-list__item--two-line">' +
-      '<span class="mdl-list__item-primary-content">' +
-      '<i class="material-icons mdl-list__item-avatar">person</i>' +
-      '<span>' + this.id + '</span>' +
-      '<span class="mdl-list__item-sub-title">' + playedDate + '</span></span>' +
-      '<span class="mdl-list__item-secondary-content">' +
-      '<a class="mdl-list__item-secondary-action" href="#">' +
-      '<i class="material-icons">' + (this.status === 'w' ? "thumb_up" : "thumb_down") +
-      '</i></a></span></li>';
-    result += template;
+    var cpTemplate = template;
+    cpTemplate = cpTemplate.replace("%USER_NAME%", this.userName);
+    cpTemplate = cpTemplate.replace("%PLAYED_DATE%", this.playedDate);
+    cpTemplate = cpTemplate.replace("%ICON_STATUS%", this.status === 'w' ? "WIN" : "LOSE");
+    result = cpTemplate + result;
   });
   return result;
 };
@@ -320,8 +277,8 @@ OneToNine.prototype.toastFailMessage = function (msg) {
 };
 
 // Saves the messaging device token to the datastore.
-OneToNine.prototype.saveMessagingDeviceToken = function() {
-  firebase.messaging().getToken().then(function(currentToken) {
+OneToNine.prototype.saveMessagingDeviceToken = function () {
+  firebase.messaging().getToken().then(function (currentToken) {
     if (currentToken) {
       //console.log('Got FCM device token:', currentToken);
       // Saving the Device Token to the datastore.
@@ -331,27 +288,27 @@ OneToNine.prototype.saveMessagingDeviceToken = function() {
       // Need to request permissions to show notifications.
       this.requestNotificationsPermissions();
     }
-  }.bind(this)).catch(function(error){
+  }.bind(this)).catch(function (error) {
     console.error('Unable to get messaging token.', error);
   });
 };
 
 // Requests permissions to show notifications.
-OneToNine.prototype.requestNotificationsPermissions = function() {
+OneToNine.prototype.requestNotificationsPermissions = function () {
   console.log('Requesting notifications permission...');
-  firebase.messaging().requestPermission().then(function() {
+  firebase.messaging().requestPermission().then(function () {
     // Notification permission granted.
     this.saveMessagingDeviceToken();
-  }.bind(this)).catch(function(error) {
+  }.bind(this)).catch(function (error) {
     console.error('Unable to get permission to notify.', error);
   });
 };
 
-OneToNine.prototype.sendInvitationGame = function() {
+OneToNine.prototype.sendInvitationGame = function () {
 
 };
 
-OneToNine.prototype.sendThankSubscribing = function() {
+OneToNine.prototype.sendThankSubscribing = function () {
 
 };
 
@@ -359,18 +316,22 @@ OneToNine.prototype.sendThankSubscribing = function() {
 OneToNine.S_HISTORY_TEMPLATE =
   '<li class="mdl-list__item mdl-list__item--two-line">' +
   '<span class="mdl-list__item-primary-content">' +
-  '<i class="material-icons mdl-list__item-avatar">person</i>' +
   '<span>%ID%</span>' +
   '<span class="mdl-list__item-sub-title">%PLAYED_DATE%</span></span>' +
   '<span class="mdl-list__item-secondary-content">' +
   '<a class="mdl-list__item-secondary-action" href="#"><i class="material-icons">%STATUS%</i></a></span></li>';
 
 window.onload = function () {
+  window.document.addEventListener('touchstart', function(e) {
+    console.log(e.defaultPrevented);  // will be false
+    e.preventDefault();   // does nothing since the listener is passive
+    console.log(e.defaultPrevented);  // still false
+  }, {passive: true});
   window.oneToNine = new OneToNine();
 };
 
-function sHistory(key, playedDate, status) {
-  this.key = key;
+function sHistory(userName, playedDate, status) {
+  this.userName = userName;
   this.playedDate = playedDate;
   this.status = status;
 }
