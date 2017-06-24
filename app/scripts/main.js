@@ -17,6 +17,7 @@
  *
  */
 /* eslint-env browser */
+
 (function () {
   'use strict';
 
@@ -74,6 +75,8 @@
   // Your custom JavaScript goes here
 })();
 
+
+
 function OneToNine() {
 
   //VARIABLE
@@ -91,14 +94,15 @@ function OneToNine() {
   this.userName = document.getElementById('user-name');
   this.signInButton = document.getElementById('sign-in');
   this.signOutButton = document.getElementById('sign-out');
-  this.historyList = document.getElementById('history-list')
-
+  this.historyList = document.getElementById('history-list');
+  this.showSnackbarButton = document.getElementById('show-snackbar-button');
+  this.singleHistorySection = document.getElementById('single-history-section')
 
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
 
-  this.fetchHistoriesBtn = document.getElementById('test-histories-list');
-  this.fetchHistoriesBtn.addEventListener('click', this.loadSingleHistory.bind(this));
+  //this.fetchHistoriesBtn = document.getElementById('test-histories-list');
+  //this.fetchHistoriesBtn.addEventListener('click', this.loadSingleHistory.bind(this));
 
   for (var i = 0; i < 9; i++) {
     //var slot = $('#slot' + (i + 1));
@@ -172,17 +176,23 @@ OneToNine.prototype.onAuthStateChanged = function (user) {
 
     // Hide sign-in button.
     this.signInButton.setAttribute('hidden', 'true');
+    this.singleHistorySection.removeAttribute('hidden');
 
     this.userUUID = user.uid;
     // Load history online
+    this.loadSingleHistory();
 
     // Push offline history to online
+
+    //Save divice token to push notification
+    this.saveMessagingDeviceToken();
   } else { // User is signed out!
     this.userUUID = '';
     // Hide user's profile and sign-out button.
     this.userName.setAttribute('hidden', 'true');
     this.userPic.setAttribute('hidden', 'true');
     this.signOutButton.setAttribute('hidden', 'true');
+    this.singleHistorySection.setAttribute('hidden', 'true');
 
     // Show sign-in button.
     this.signInButton.removeAttribute('hidden');
@@ -249,23 +259,20 @@ OneToNine.prototype.selectSingleBoard = function (e) {
 
   if (this.isPlaying) {
     if (this.answer.length === 0 && selectedValue === 1) {
-      console.log("first chose is true");
       this.answer.push(selectedValue);
     } else if (this.answer.length > 0 && this.answer.length < 8 && this.answer[this.answer.length - 1] === selectedValue - 1) {
-      console.log("next chose is true");
       this.answer.push(selectedValue);
     } else if (this.answer.length === 8 && selectedValue === 9) {
-      console.log("last chose is true");
+      //console.log("last chose is true");
       this.answer.push(selectedValue);
-      alert("win");
+      this.toastSuccessMessage('Congratulation!! You win...');
       this.addSingleHistory(new sHistory(this.userUUID, $.now(), 'w'));
-      //console.log(this.answer);
-
-      console.log("new board is loading");
+      //console.log("new board is loading");
       this.initSingleBoardGame();
     } else {
-      alert("lose");
-      console.log("new board is loading");
+      this.toastFailMessage('Give up pls!! Loser');
+      //console.log("new board is loading");
+      this.addSingleHistory(new sHistory(this.userUUID, $.now(), 'l'));
       this.initSingleBoardGame();
     }
   }
@@ -299,6 +306,55 @@ OneToNine.prototype.renderHistoryList = function (isSingle, historyList) {
   });
   return result;
 };
+
+OneToNine.prototype.toastSuccessMessage = function (msg) {
+  var data = {message: msg, timeout: 2000};
+  this.showSnackbarButton.style.backgroundColor = '#1abc9c';
+  this.showSnackbarButton.MaterialSnackbar.showSnackbar(data);
+};
+
+OneToNine.prototype.toastFailMessage = function (msg) {
+  var data = {message: msg, timeout: 2000};
+  this.showSnackbarButton.style.backgroundColor = '#e74c3c';
+  this.showSnackbarButton.MaterialSnackbar.showSnackbar(data);
+};
+
+// Saves the messaging device token to the datastore.
+OneToNine.prototype.saveMessagingDeviceToken = function() {
+  firebase.messaging().getToken().then(function(currentToken) {
+    if (currentToken) {
+      //console.log('Got FCM device token:', currentToken);
+      // Saving the Device Token to the datastore.
+      firebase.database().ref('/fcmTokens').child(currentToken)
+        .set(firebase.auth().currentUser.uid);
+    } else {
+      // Need to request permissions to show notifications.
+      this.requestNotificationsPermissions();
+    }
+  }.bind(this)).catch(function(error){
+    console.error('Unable to get messaging token.', error);
+  });
+};
+
+// Requests permissions to show notifications.
+OneToNine.prototype.requestNotificationsPermissions = function() {
+  console.log('Requesting notifications permission...');
+  firebase.messaging().requestPermission().then(function() {
+    // Notification permission granted.
+    this.saveMessagingDeviceToken();
+  }.bind(this)).catch(function(error) {
+    console.error('Unable to get permission to notify.', error);
+  });
+};
+
+OneToNine.prototype.sendInvitationGame = function() {
+
+};
+
+OneToNine.prototype.sendThankSubscribing = function() {
+
+};
+
 
 OneToNine.S_HISTORY_TEMPLATE =
   '<li class="mdl-list__item mdl-list__item--two-line">' +

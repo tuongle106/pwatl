@@ -131,24 +131,13 @@
             </div>
           </div>
           <div class="count-down-section">
-            Count down:
             <p></p>
           </div>
         </div>
         <!--/GAME BOARD-->
 
-        <div class="mdl-card mdl-cell mdl-cell--12-col">
+        <div hidden class="mdl-card mdl-cell mdl-cell--12-col" id="single-history-section">
           <ul class="demo-list-two mdl-list" id="history-list">
-            <li class="mdl-list__item mdl-list__item--two-line">
-              <span class="mdl-list__item-primary-content">
-                <i class="material-icons mdl-list__item-avatar">person</i>
-                <span>Bryan Cranston</span>
-                <span class="mdl-list__item-sub-title">62 Episodes</span>
-              </span>
-              <span class="mdl-list__item-secondary-content">
-                <a class="mdl-list__item-secondary-action" href="#"><i class="material-icons">star</i></a>
-              </span>
-            </li>
           </ul>
         </div>
       </div>
@@ -156,7 +145,8 @@
     <section class="mdl-layout__tab-panel" id="fixed-tab-2">
       <div class="page-content"><!-- Your content goes here -->
         <div class="mdl-card mdl-cell mdl-cell--12-col">
-          <form action="#">
+          <h1>Coming soon!!!!</h1>
+          <!--<form action="#">
             <div class="text-field-warpper">
               <div class="mdl-textfield mdl-js-textfield">
                 <input class="mdl-textfield__input" type="text" id="usermane" pattern="[A-Z,a-z, ]*">
@@ -173,27 +163,31 @@
             </div>
             <div class="text-field-warpper">
               <button type="button"
-                      class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                      class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;colored">
                 Sign in
               </button>
               <button type="button" id="test-histories-list"
-                      class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                      class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;colored">
                 FETCH DATA
               </button>
               <button type="button"
-                      class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                      class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;colored">
                 Sign out
               </button>
-              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+              <button class="mdl-button mdl-js-button mdl-button&#45;&#45;raised mdl-js-ripple-effect mdl-button&#45;&#45;accent"
                       onclick="test()">
                 Cancel
               </button>
             </div>
-          </form>
+          </form>-->
         </div>
       </div>
     </section>
   </main>
+  <div id="show-snackbar-button" class="mdl-js-snackbar mdl-snackbar">
+    <div class="mdl-snackbar__text"></div>
+    <button class="mdl-snackbar__action" type="button"></button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>
