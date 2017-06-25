@@ -69,7 +69,7 @@ function OneToNine() {
   this.signInButton.addEventListener('click', this.signIn.bind(this));
 
   this.playButton.addEventListener('click', this.initSingleBoardGame.bind(this));
-  this.replayButton.addEventListener('click', this.initSingleBoardGame.bind(this));
+  //this.replayButton.addEventListener('click', this.initSingleBoardGame.bind(this));
 
   this.loadSingleHistory();
   //this.initSingleBoardGame();
@@ -77,6 +77,9 @@ function OneToNine() {
   this.initFirebase();
 }
 
+OneToNine.prototype.showInstruction = function (){
+
+};
 
 OneToNine.prototype.checkSetup = function () {
   if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
@@ -185,12 +188,10 @@ OneToNine.prototype.initSingleBoardGame = function () {
   for (var i = 0; i < 9; i++) {
     var slot = $('#slot' + (i + 1));
     slot.find('p').text(array[i]);
-    //slot.click(this.selectSingleBoard);
-    //document.getElementById('slot' + (i + 1)).addEventListener('click', this.selectSingleBoard.bind(this));
-    //slot.click(this.selectSingleBoard.bind(this));
+    slot.removeAttr('disabled');
   }
-
-  var initTimeout = setTimeout(this.setClickButtonAction.bind(this), 3000);
+  this.replayButton.removeAttribute('hidden');
+  var initTimeout = setTimeout(this.setClickButtonAction.bind(this), 6000);
 };
 
 
@@ -205,7 +206,9 @@ OneToNine.prototype.handleStartGame = function() {
   for (var i = 0; i < 9; i++) {
     var slot = $('#slot' + (i + 1));
     slot.find('p').hide();
+    slot.removeAttr('disabled');
   }
+  this.replayButton.setAttribute('hidden','true');
 
   //var startTimeout = setTimeout(this.handleTimeOut(), 6000);
 };
@@ -214,6 +217,7 @@ OneToNine.prototype.handleTimeOut = function() {
   for (var i = 0; i < 9; i++) {
     var slot = $('#slot' + (i + 1));
     slot.find('p').show();
+    slot.attr('disabled','disabled');
   }
 };
 
@@ -263,7 +267,7 @@ OneToNine.prototype.selectSingleBoard = function (e) {
       this.answer.push(selectedValue);
       this.toastSuccessMessage('Congratulation!! You win... (y)');
       this.addSingleHistory(new sHistory(this.userName.textContent, $.now(), 'w'));
-      this.initSingleBoardGame();
+      //this.initSingleBoardGame();
     } else {
       this.handleTimeOut();
       this.toastFailMessage('Give up pls!! Loser :)');
@@ -295,7 +299,7 @@ OneToNine.prototype.renderHistoryList = function (isSingle, historyList) {
   $.each(historyList, function () {
     var cpTemplate = template;
     cpTemplate = cpTemplate.replace("%USER_NAME%", this.userName || "OFFLINE-ER");
-    cpTemplate = cpTemplate.replace("%PLAYED_DATE%", this.playedDate);
+    cpTemplate = cpTemplate.replace("%PLAYED_DATE%", this.playedDate ? $.format.date(this.playedDate, 'dd/mm/yyyy hh:mm') : '');
     cpTemplate = cpTemplate.replace("%ICON_STATUS%", this.status === 'w' ? "mood" : "mood_bad");
     cpTemplate = cpTemplate.replace("%ICON_SYN%", this.id ? "sync" : "sync_disabled");
     result = cpTemplate + result;
@@ -306,7 +310,7 @@ OneToNine.prototype.renderHistoryList = function (isSingle, historyList) {
 OneToNine.prototype.renderHistoryItem = function (history) {
   var item = this.S_HISTORY_TEMPLATE;
   item = item.replace("%USER_NAME%", history.username || "OFFLINE-ER");
-  item = item.replace("%PLAYED_DATE%", history.playedDate);
+  item = item.replace("%PLAYED_DATE%", history.playedDate ? $.format.date(history.playedDate, 'dd/mm/yyyy hh:mm') : '');
   item = item.replace("%ICON_STATUS%", history.status === 'w' ? "mood" : "mood_bad");
   item = item.replace("%ICON_SYN%", history.id ? "sync" : "sync_disabled");
   return item;
