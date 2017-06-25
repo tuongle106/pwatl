@@ -28,7 +28,7 @@
   <meta name="msapplication-TileColor" content="#2F3BA2">
   <meta name="theme-color" content="#2F3BA2">
 
-  <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.min.js"></script>
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -72,10 +72,12 @@
     <span class="mdl-layout-title">OneToNine</span>
     <nav class="mdl-navigation">
       <!--IF USER LOGIN && ONLINE-->
-      <a class="mdl-navigation__link" href="#fixed-tab-2" hidden id="sign-out">Sign out</a>
-      <a class="mdl-navigation__link" href="https://github.com/tuongle106/pwatl">Git</a>
-      <a class="mdl-navigation__link">Rate</a>
-      <a class="mdl-navigation__link" href="#fixed-tab-1">About</a>
+      <a class="mdl-navigation__link" href="#fixed-tab-2" hidden id="sign-out">
+        <i class="material-icons">power_settings_new</i> Sign out</a>
+      <a class="mdl-navigation__link" href="#fixed-tab-1">
+        <i class="material-icons">star</i> Rate</a>
+      <a class="mdl-navigation__link" href="#fixed-tab-1">
+        <i class="material-icons">import_contacts</i> About</a>
     </nav>
   </div>
   <main class="mdl-layout__content">
@@ -149,7 +151,8 @@
                 <i class="icon material-icons">sync</i>
               </span> Sync-ed
             </span>
-            <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active" id="progress-bar-history" style="float: right;"></div>
+            <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active" id="progress-bar-history"
+                 style="float: right;"></div>
           </div>
           <div class="demo-list-two mdl-list" id="history-list">
           </div>
@@ -165,10 +168,17 @@
     </section>
   </main>
   <div id="show-snackbar-button" class="mdl-js-snackbar mdl-snackbar">
-    <div class="mdl-snackbar__text"></div>
+    <div class="mdl-snackbar__text" style="text-align: center"></div>
     <button class="mdl-snackbar__action" type="button"></button>
   </div>
+  <button id="play-button"
+    class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored float-button-right">
+    <i class="material-icons">play_arrow</i></button>
+  <button id="replay-button"
+    class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored float-button-left">
+    <i class="material-icons">replay</i></button>
 </div>
+
 <script src="scripts/main.min.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/4.1.2/firebase.js"></script>

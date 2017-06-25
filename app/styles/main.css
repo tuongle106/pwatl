@@ -286,3 +286,29 @@ html, body {
     display: none;
   }*/
 }
+
+.float-button-right {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  padding: 15px;
+  font-size: 40px;
+  background: rgb(255,64,129);
+  position: fixed;
+  bottom: 40px; /* Adjust to where you want it */
+  right: 20px; /* Adjust to where you want it */
+  z-index: 9999;
+}
+
+.float-button-left {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  padding: 15px;
+  font-size: 40px;
+  background: rgb(255,64,129);
+  position: fixed;
+  bottom: 40px; /* Adjust to where you want it */
+  left: 20px; /* Adjust to where you want it */
+  z-index: 9999;
+}

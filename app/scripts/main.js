@@ -62,18 +62,17 @@ function OneToNine() {
   this.progresBarHistory = document.getElementById('progress-bar-history');
   this.profileContainer = document.getElementById('profile-container');
 
+  this.playButton = document.getElementById('play-button');
+  this.replayButton = document.getElementById('replay-button');
+
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
 
-  for (var i = 0; i < 9; i++) {
-    //var slot = $('#slot' + (i + 1));
-    //slot.find('p').text(array[i]);
-    //slot.click(this.selectSingleBoard);
-    document.getElementById('slot' + (i + 1)).addEventListener('click', this.selectSingleBoard.bind(this));
-    //slot.click(this.selectSingleBoard.bind(this));
-  }
+  this.playButton.addEventListener('click', this.initSingleBoardGame.bind(this));
+  this.replayButton.addEventListener('click', this.initSingleBoardGame.bind(this));
+
   this.loadSingleHistory();
-  this.initSingleBoardGame();
+  //this.initSingleBoardGame();
 
   this.initFirebase();
 }
@@ -97,6 +96,8 @@ OneToNine.prototype.signIn = function () {
 // Signs-out
 OneToNine.prototype.signOut = function () {
   this.auth.signOut();
+  $('.mdl-layout__drawer').toggleClass('is-visible');
+  $('.mdl-layout__obfuscator').toggleClass('is-visible');
 };
 
 // Loads chat messages history and listens for upcoming ones.
@@ -188,6 +189,32 @@ OneToNine.prototype.initSingleBoardGame = function () {
     //document.getElementById('slot' + (i + 1)).addEventListener('click', this.selectSingleBoard.bind(this));
     //slot.click(this.selectSingleBoard.bind(this));
   }
+
+  var initTimeout = setTimeout(this.setClickButtonAction.bind(this), 3000);
+};
+
+
+OneToNine.prototype.setClickButtonAction = function () {
+  for (var i = 0; i < 9; i++) {
+    document.getElementById('slot' + (i + 1)).addEventListener('click', this.selectSingleBoard.bind(this));
+  }
+  this.handleStartGame();
+};
+
+OneToNine.prototype.handleStartGame = function() {
+  for (var i = 0; i < 9; i++) {
+    var slot = $('#slot' + (i + 1));
+    slot.find('p').hide();
+  }
+
+  //var startTimeout = setTimeout(this.handleTimeOut(), 6000);
+};
+
+OneToNine.prototype.handleTimeOut = function() {
+  for (var i = 0; i < 9; i++) {
+    var slot = $('#slot' + (i + 1));
+    slot.find('p').show();
+  }
 };
 
 OneToNine.prototype.handleCountDown = function () {
@@ -217,7 +244,8 @@ OneToNine.prototype.cleanTimers = function () {
 
 OneToNine.prototype.selectSingleBoard = function (e) {
   this.isPlaying = true;
-  var selectedValue = parseInt(e.currentTarget.innerText);
+  var elementP = e.currentTarget.firstChild
+  var selectedValue = parseInt(elementP.innerText);
   if (!this.isCountingDown) {
     this.isCountingDown = true;
     //this.singleCountDown();
@@ -226,20 +254,20 @@ OneToNine.prototype.selectSingleBoard = function (e) {
   if (this.isPlaying) {
     if (this.answer.length === 0 && selectedValue === 1) {
       this.answer.push(selectedValue);
+      elementP.removeAttribute('style')
     } else if (this.answer.length > 0 && this.answer.length < 8 && this.answer[this.answer.length - 1] === selectedValue - 1) {
       this.answer.push(selectedValue);
+      elementP.removeAttribute('style')
     } else if (this.answer.length === 8 && selectedValue === 9) {
-      //console.log("last chose is true");
+      elementP.removeAttribute('style');
       this.answer.push(selectedValue);
       this.toastSuccessMessage('Congratulation!! You win... (y)');
       this.addSingleHistory(new sHistory(this.userName.textContent, $.now(), 'w'));
-      //console.log("new board is loading");
       this.initSingleBoardGame();
     } else {
+      this.handleTimeOut();
       this.toastFailMessage('Give up pls!! Loser :)');
-      //console.log("new board is loading");
       this.addSingleHistory(new sHistory(this.userName.textContent, $.now(), 'l'));
-      this.initSingleBoardGame();
     }
   }
   console.log(selectedValue);
@@ -376,3 +404,10 @@ function sHistory(userName, playedDate, status) {
   this.playedDate = playedDate;
   this.status = status;
 }
+
+$( document ).ready(function() {
+  $('.mdl-navigation__link').click(function(){
+    $('.mdl-layout__drawer').toggleClass('is-visible');
+    $('.mdl-layout__obfuscator').toggleClass('is-visible');
+  });
+});
