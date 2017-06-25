@@ -40,7 +40,6 @@
   // Your custom JavaScript goes here
 })();
 
-
 function OneToNine() {
 
   //VARIABLE
@@ -60,6 +59,7 @@ function OneToNine() {
   this.historyList = document.getElementById('history-list');
   this.showSnackbarButton = document.getElementById('show-snackbar-button');
   this.singleHistorySection = document.getElementById('single-history-section');
+  this.progresBarHistory = document.getElementById('progress-bar-history');
   this.profileContainer = document.getElementById('profile-container');
 
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
@@ -72,6 +72,7 @@ function OneToNine() {
     document.getElementById('slot' + (i + 1)).addEventListener('click', this.selectSingleBoard.bind(this));
     //slot.click(this.selectSingleBoard.bind(this));
   }
+  this.loadSingleHistory();
   this.initSingleBoardGame();
 
   this.initFirebase();
@@ -100,16 +101,19 @@ OneToNine.prototype.signOut = function () {
 
 // Loads chat messages history and listens for upcoming ones.
 OneToNine.prototype.loadSingleHistory = function () {
-  this.historiesRef = this.database.ref('s_histories');
-
-  /*var topHistory = this.historiesRef.orderByChild('playedDate').limitToLast(10);
-   console.log(topHistory);*/
-  var setMessage = function (data) {
-    this.historyList.innerHTML = this.renderHistoryList(true, data.val());
-  }.bind(this);
-  this.historiesRef.off();
-  this.historiesRef.orderByChild('playedDate').limitToLast(10).on('value', setMessage);
-
+  this.progresBarHistory.removeAttribute('hidden');
+  if (firebase.auth().currentUser) {
+    this.historiesRef = this.database.ref('s_histories');
+    var setMessage = function (data) {
+      this.historyList.innerHTML = this.renderHistoryList(true, data.val());
+    }.bind(this);
+    this.historiesRef.off();
+    this.historiesRef.orderByChild('playedDate').limitToLast(10).on('value', setMessage);
+  } else {
+    var oldHistory = JSON.parse(localStorage.getItem('s_histories_local')) || [];
+    this.historyList.innerHTML = this.renderHistoryList(true, oldHistory);
+  }
+  this.progresBarHistory.setAttribute('hidden', 'true');
   //this.historiesRef.limitToLast(12).on('child_added', setMessage);
   //this.historiesRef.limitToLast(12).on('child_changed', setMessage);
 };
@@ -125,6 +129,7 @@ OneToNine.prototype.initFirebase = function () {
 
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 OneToNine.prototype.onAuthStateChanged = function (user) {
+  this.progresBarHistory.removeAttribute('hidden');
   if (user) { // User is signed in!
     var profilePicUrl = user.photoURL;
     var userName = user.displayName;
@@ -137,24 +142,27 @@ OneToNine.prototype.onAuthStateChanged = function (user) {
 
     // Hide sign-in button.
     this.signInButton.setAttribute('hidden', 'true');
-    this.singleHistorySection.removeAttribute('hidden');
+    //this.singleHistorySection.removeAttribute('hidden');
+
+    //Synchronize local data
+    this.synLocalHistory();
     // Load history online
     this.loadSingleHistory();
 
-    // Push offline history to online
-
-    //Save divice token to push notification
+    //Save device token to push notification
     this.saveMessagingDeviceToken();
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
+    this.userName.textContent = '';
     this.userName.setAttribute('hidden', 'true');
     this.signOutButton.setAttribute('hidden', 'true');
     this.profileContainer.setAttribute('hidden', 'true');
-    this.singleHistorySection.setAttribute('hidden', 'true');
+    //this.singleHistorySection.setAttribute('hidden', 'true');
 
     // Show sign-in button.
     this.signInButton.removeAttribute('hidden');
   }
+  this.progresBarHistory.setAttribute('hidden', 'true');
 };
 
 OneToNine.prototype.initSingleBoardGame = function () {
@@ -238,30 +246,42 @@ OneToNine.prototype.selectSingleBoard = function (e) {
 };
 
 OneToNine.prototype.addSingleHistory = function (history) {
-  this.historiesRef = this.database.ref('s_histories');
-  var newHistory = this.historiesRef.push();
-  history.id = newHistory.key;
-  newHistory.set(history);
-  console.log("Add Single history successful ", newHistory.toString());
+  var user = firebase.auth().currentUser;
+  //in case user logged in --> data will be syn by Fire base database offline
+  if (user !== null) {
+    this.historiesRef = this.database.ref('s_histories');
+    var newHistory = this.historiesRef.push();
+    history.id = newHistory.key;
+    newHistory.set(history);
+    console.log("Add Single history successful ", newHistory.toString());
+  } else { //in case user logged in data will be keep in local storage that will be syn later
+    //Save to localStorage that will be syn later
+    this.storageLocal(history);
+    this.historyList.innerHTML = this.renderHistoryItem(history) + this.historyList.innerHTML;
+  }
 };
 
 OneToNine.prototype.renderHistoryList = function (isSingle, historyList) {
   var result = '';
-  var template =
-    '<li class="mdl-list__item mdl-list__item--two-line">' +
-    '<span class="mdl-list__item-primary-content">' +
-    '<span>%USER_NAME%</span>' +
-    '<span class="mdl-list__item-sub-title">%PLAYED_DATE%</span></span>' +
-    '<span class="mdl-list__item-secondary-content">' +
-    '<span class="mdl-list__item-secondary-action">%ICON_STATUS%</span></span></li>';
+  var template = this.S_HISTORY_TEMPLATE;
   $.each(historyList, function () {
     var cpTemplate = template;
-    cpTemplate = cpTemplate.replace("%USER_NAME%", this.userName);
+    cpTemplate = cpTemplate.replace("%USER_NAME%", this.userName || "OFFLINE-ER");
     cpTemplate = cpTemplate.replace("%PLAYED_DATE%", this.playedDate);
-    cpTemplate = cpTemplate.replace("%ICON_STATUS%", this.status === 'w' ? "WIN" : "LOSE");
+    cpTemplate = cpTemplate.replace("%ICON_STATUS%", this.status === 'w' ? "mood" : "mood_bad");
+    cpTemplate = cpTemplate.replace("%ICON_SYN%", this.id ? "sync" : "sync_disabled");
     result = cpTemplate + result;
   });
   return result;
+};
+
+OneToNine.prototype.renderHistoryItem = function (history) {
+  var item = this.S_HISTORY_TEMPLATE;
+  item = item.replace("%USER_NAME%", history.username || "OFFLINE-ER");
+  item = item.replace("%PLAYED_DATE%", history.playedDate);
+  item = item.replace("%ICON_STATUS%", history.status === 'w' ? "mood" : "mood_bad");
+  item = item.replace("%ICON_SYN%", history.id ? "sync" : "sync_disabled");
+  return item;
 };
 
 OneToNine.prototype.toastSuccessMessage = function (msg) {
@@ -312,17 +332,38 @@ OneToNine.prototype.sendThankSubscribing = function () {
 
 };
 
+OneToNine.prototype.storageLocal = function (history) {
+  var oldHistory = JSON.parse(localStorage.getItem('s_histories_local')) || [];
+  oldHistory.push(history);
+  if (oldHistory.length === 6) { //Suport max 5 items latest offline
+    oldHistory.splice(0, 1);
+  }
+  localStorage.setItem('s_histories_local', JSON.stringify(oldHistory));
+  console.log('Data has been saved');
+};
 
-OneToNine.S_HISTORY_TEMPLATE =
+OneToNine.prototype.synLocalHistory = function () {
+  var oldHistory = JSON.parse(localStorage.getItem('s_histories_local')) || [];
+
+  for (var i = 0; i < oldHistory.length; i++) {
+    this.addSingleHistory(oldHistory);
+  }
+  localStorage.removeItem('s_histories_local');
+  console.log('Local data have been syn-ed');
+};
+
+
+OneToNine.prototype.S_HISTORY_TEMPLATE =
   '<li class="mdl-list__item mdl-list__item--two-line">' +
   '<span class="mdl-list__item-primary-content">' +
-  '<span>%ID%</span>' +
+  '<span>%USER_NAME%</span>' +
   '<span class="mdl-list__item-sub-title">%PLAYED_DATE%</span></span>' +
   '<span class="mdl-list__item-secondary-content">' +
-  '<a class="mdl-list__item-secondary-action" href="#"><i class="material-icons">%STATUS%</i></a></span></li>';
+  '<span class="mdl-list__item-secondary-action"><i class="icon material-icons" style="font-size: 40px;">%ICON_STATUS%</i></span></span>' +
+  '<span class="mdl-list__item-secondary-content"><i class="icon material-icons" style="font-size: 20px;">%ICON_SYN%</i></span></li>';
 
 window.onload = function () {
-  window.document.addEventListener('touchstart', function(e) {
+  window.document.addEventListener('touchstart', function (e) {
     console.log(e.defaultPrevented);  // will be false
     e.preventDefault();   // does nothing since the listener is passive
     console.log(e.defaultPrevented);  // still false

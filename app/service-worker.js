@@ -15,7 +15,9 @@ self.addEventListener('install', function(e) {
         'manifest.json',
         '/scripts/main.min.js',
         '/styles/main.css',
-        '/styles/material.indigo-pink.min.css'
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js',
+        'https://code.getmdl.io/1.3.0/material.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
       ]).then(function() {
         self.skipWaiting();
       });
