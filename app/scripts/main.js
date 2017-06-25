@@ -187,6 +187,7 @@ OneToNine.prototype.initSingleBoardGame = function () {
   for (var i = 0; i < 9; i++) {
     var slot = $('#slot' + (i + 1));
     slot.find('p').text(array[i]);
+    slot.find('p').show();
     slot.attr('disabled','disabled');
   }
   this.replayButton.removeAttribute('hidden');
