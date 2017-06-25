@@ -41,7 +41,6 @@
 })();
 
 function OneToNine() {
-
   //VARIABLE
   this.isPlaying = false;
   this.isCountingDown = false; //10 sec
@@ -67,12 +66,14 @@ function OneToNine() {
 
   this.signOutButton.addEventListener('click', this.signOut.bind(this));
   this.signInButton.addEventListener('click', this.signIn.bind(this));
-
   this.playButton.addEventListener('click', this.initSingleBoardGame.bind(this));
-  //this.replayButton.addEventListener('click', this.initSingleBoardGame.bind(this));
 
   this.loadSingleHistory();
-  //this.initSingleBoardGame();
+  for (var i = 0; i < 9; i++) {
+    var slot = $('#slot' + (i + 1));
+    slot.attr('disabled','disabled');
+    slot.click(this.selectSingleBoard.bind(this));
+  }
 
   this.initFirebase();
 }
@@ -118,8 +119,6 @@ OneToNine.prototype.loadSingleHistory = function () {
     this.historyList.innerHTML = this.renderHistoryList(true, oldHistory);
   }
   this.progresBarHistory.setAttribute('hidden', 'true');
-  //this.historiesRef.limitToLast(12).on('child_added', setMessage);
-  //this.historiesRef.limitToLast(12).on('child_changed', setMessage);
 };
 
 // Initiate firebase auth, database and storage.
@@ -188,17 +187,15 @@ OneToNine.prototype.initSingleBoardGame = function () {
   for (var i = 0; i < 9; i++) {
     var slot = $('#slot' + (i + 1));
     slot.find('p').text(array[i]);
-    slot.removeAttr('disabled');
+    slot.attr('disabled','disabled');
   }
   this.replayButton.removeAttribute('hidden');
+  this.playButton.setAttribute('disabled','disabled');
   var initTimeout = setTimeout(this.setClickButtonAction.bind(this), 6000);
 };
 
 
 OneToNine.prototype.setClickButtonAction = function () {
-  for (var i = 0; i < 9; i++) {
-    document.getElementById('slot' + (i + 1)).addEventListener('click', this.selectSingleBoard.bind(this));
-  }
   this.handleStartGame();
 };
 
@@ -209,8 +206,7 @@ OneToNine.prototype.handleStartGame = function() {
     slot.removeAttr('disabled');
   }
   this.replayButton.setAttribute('hidden','true');
-
-  //var startTimeout = setTimeout(this.handleTimeOut(), 6000);
+  this.playButton.removeAttribute('disabled');
 };
 
 OneToNine.prototype.handleTimeOut = function() {
